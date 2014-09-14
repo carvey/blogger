@@ -22,8 +22,8 @@ class PostView(View):
 
     def get(self, request, requested_category, id):
         category = Category.objects.get(title=requested_category)
-        post = Entry.objects.get(id=id)
+        entry = Entry.objects.get(id=id)
 
         return render(request, self.template, {'category': category,
-                                               'post': post,
+                                               'entry': entry,
                                                })
