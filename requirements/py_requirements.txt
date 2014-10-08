@@ -11,3 +11,4 @@ pytz
 pyparsing==2.0.1
 django-xmlrpc==0.1.5
 django-blog-zinnia
+gunicorn
