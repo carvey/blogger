@@ -1,0 +1,6 @@
+[program:{{ item.name }}]
+command = /var/www/{{ item.name }}/bin/start_gunicorn
+user = web_man
+stdout_logfile = /var/www/{{ item.name }}/logs/gunicorn_supervisor.log
+redirect_stderr = true
+environment=LANG=en_US.UTF-8,LC_ALL=en_US.UTF-8

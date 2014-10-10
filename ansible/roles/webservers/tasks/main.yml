@@ -1,0 +1,81 @@
+---
+
+- name: ensure github is a known host
+  action: sshknownhosts host=github.com state=present
+
+- name: checkout sites
+  git:
+    repo="{{ item.repo }}"
+    dest="{{ item.dest }}/{{ item.name }}"
+    accept_hostkey=yes
+    update=yes
+    key_file="/home/ubuntu/.ssh/id_rsa"
+  with_items:
+    sites
+
+- name: setup virtualenvs
+  shell:
+    command="virtualenv {{ item.dest }}"
+  with_items:
+    sites
+
+- name: install requirements
+  pip:
+    requirements="{{ item.dest }}/{{ item.name }}/requirements/py_requirements.txt"
+    virtualenv="{{ item.dest }}"
+  with_items:
+    sites
+
+- name: install gunicorn
+  pip:
+    name="gunicorn"
+    virtualenv="{{ item.dest }}"
+  with_items:
+    sites
+
+- name: gunicorn start script
+  template: src=start_gunicorn dest=/var/www/{{ item.name }}/bin/start_gunicorn mode=777
+  with_items:
+    sites
+
+- name: set gunicorn script to executable
+  command: "sudo chmod u+x {{ item.dest }}/bin/start_gunicorn"
+  with_items:
+    sites
+
+- name: create the run folder to store the gunicorn communication sock
+  command: "mkdir {{ item.dest }}/run -p"
+  with_items:
+    sites
+
+- name: setup supervisor configs
+  template:
+    src=supervisor
+    dest=/etc/supervisor/conf.d/{{ item.name }}.conf
+  with_items:
+    sites
+
+
+- name: create supervisor logs folder & file
+  command: "mkdir -p /var/www/{{ item.name }}/logs && touch /var/www/{{ item.name }}/logs/gunicorn_supervisor.log"
+  ignore_errors: True
+  with_items:
+    sites
+
+- name: ensure supervisor is working and reading all confs
+  supervisorctl:
+    name={{ item.name }}
+    state=started
+    config=/etc/supervisor/conf.d/{{ item.name }}.conf
+  with_items:
+    sites
+
+- name: setup nginx confs
+  template:
+    src=nginx
+    dest=/etc/nginx/sites-enabled/nginx_config
+
+- name: ensure nginx is running
+  service:
+    name=nginx
+    state=restarted
