@@ -26,6 +26,11 @@
   with_items:
     sites
 
+- name: add a static folder
+  command: "mkdir -p {[ item.dest }}/static"
+  with_items:
+    sites
+
 - name: install gunicorn
   pip:
     name="gunicorn"
