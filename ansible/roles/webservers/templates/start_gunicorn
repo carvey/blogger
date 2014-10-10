@@ -1,3 +1,5 @@
+#!/bin/bash
+
 NAME="savoysterhouse"                                  # Name of the application
 DJANGODIR=/var/www/{{ item.name }}/{{ item.name }}            # Django project directory
 SOCKFILE=/var/www/{{ item.name }}/run/gunicorn.sock  # we will communicte using this unix socket

@@ -73,9 +73,15 @@
 - name: setup nginx confs
   template:
     src=nginx
-    dest=/etc/nginx/sites-enabled/nginx_config
+    dest=/etc/nginx/sites-available/nginx_config.conf
+
+- name: sym-link to sites-enabled
+  file:
+    src=/etc/nginx/sites-available/nginx_config
+    dest=/etc/nginx/sites-enabled/nginx_config.conf
+    state=link
 
 - name: ensure nginx is running
   service:
     name=nginx
-    state=restarted
+    state=started
