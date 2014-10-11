@@ -31,6 +31,14 @@
   with_items:
     sites
 
+- name: collect static files
+  django_manage:
+    command=collectstatic
+    virtualenv={{ item.dest }}
+    app_path={{ item.dest }}/{{ item.name }}
+  with_items:
+    sites
+
 - name: add a media folder
   command: "mkdir -p {{ item.dest }}/{{ item.dest }}/media"
   with_items:
