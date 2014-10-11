@@ -27,7 +27,12 @@
     sites
 
 - name: add a static folder
-  command: "mkdir -p {[ item.dest }}/static"
+  command: "mkdir -p {{ item.dest }}/static"
+  with_items:
+    sites
+
+- name: add a media folder
+  command: "mkdir -p {{ item.dest }}/{{ item.dest }}/media"
   with_items:
     sites
 
@@ -53,6 +58,11 @@
   with_items:
     sites
 
+- name: assign permissions to the project folders
+  command: "chmod 777 /var/www/{{ item.name }} -R"
+  with_items:
+    sites
+
 - name: setup supervisor configs
   template:
     src=supervisor
@@ -60,9 +70,14 @@
   with_items:
     sites
 
+- name: create supervisor logs folder
+  command: "mkdir -p /var/www/{{ item.name }}/logs"
+  ignore_errors: True
+  with_items:
+    sites
 
-- name: create supervisor logs folder & file
-  command: "mkdir -p /var/www/{{ item.name }}/logs && touch /var/www/{{ item.name }}/logs/gunicorn_supervisor.log"
+- name: create supervisor logs file
+  command: "touch /var/www/{{ item.name }}/logs/gunicorn_supervisor.log"
   ignore_errors: True
   with_items:
     sites

@@ -11,5 +11,6 @@ urlpatterns = patterns('',
                        url(r'^(?P<requested_category>\w+)/(?P<slug>[-\w]+)/$', PostView.as_view()),
                        url(r'^weblog/', include('zinnia.urls')),
                        url(r'^comments/', include('django.contrib.comments.urls')),
+                       url(r'^photologue/', include('photologue.urls', namespace='photologue')),
 
 )

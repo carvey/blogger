@@ -3,6 +3,7 @@ import datetime
 import pytz
 from django import template
 from pytz import timezone
+from django.conf import settings
 
 register = template.Library()
 
@@ -12,3 +13,7 @@ def adjust_time(time):
     fmt = '%Y-%m-%d %H:%M:%S %Z%z'
     loc_dt = eastern.localize(time)
     return time
+
+@register.simple_tag
+def settings_value(name):
+    return getattr(settings, name, "")
