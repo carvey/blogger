@@ -13,21 +13,17 @@
   with_items:
     sites
 
-- name: setup virtualenvs
-  shell:
-    command="virtualenv {{ item.dest }}"
-  with_items:
-    sites
-
-- name: install requirements
+- name: setup virtualenvs with requirements
   pip:
-    requirements="{{ item.dest }}/{{ item.name }}/requirements/py_requirements.txt"
     virtualenv="{{ item.dest }}"
+    requirements="{{ item.dest }}/{{ item.name }}/requirements/py_requirements.txt"
   with_items:
     sites
 
 - name: add a static folder
-  command: "mkdir -p {{ item.dest }}/static"
+  file:
+    path={{ item.dest }}/static
+    state=directory
   with_items:
     sites
 
@@ -40,7 +36,9 @@
     sites
 
 - name: add a media folder
-  command: "mkdir -p {{ item.dest }}/{{ item.dest }}/media"
+  file:
+    path={{ item.dest }}/{{ item.name }}/media
+    state=directory
   with_items:
     sites
 
@@ -51,44 +49,61 @@
   with_items:
     sites
 
-- name: gunicorn start script
-  template: src=start_gunicorn dest=/var/www/{{ item.name }}/bin/start_gunicorn mode=777
+- name: create gunicorn start script
+  template: src=start_gunicorn.j2 dest={{ item.dest }}/bin/start_gunicorn mode=777
   with_items:
     sites
 
 - name: set gunicorn script to executable
-  command: "sudo chmod u+x {{ item.dest }}/bin/start_gunicorn"
+  file:
+    path={{ item.dest }}/bin/start_gunicorn
+    mode="0700"
   with_items:
     sites
 
 - name: create the run folder to store the gunicorn communication sock
-  command: "mkdir {{ item.dest }}/run -p"
+  file:
+    path={{ item.dest }}/run
+    state=directory
   with_items:
     sites
 
 - name: assign permissions to the project folders
-  command: "chmod 777 /var/www/{{ item.name }} -R"
+  file:
+    path={{ item.dest }}/../{{ item.name }}
+    state=directory
+    mode="777"
+    recurse=yes
   with_items:
     sites
 
+
 - name: setup supervisor configs
   template:
-    src=supervisor
+    src=supervisor.conf.j2
     dest=/etc/supervisor/conf.d/{{ item.name }}.conf
   with_items:
     sites
 
 - name: create supervisor logs folder
-  command: "mkdir -p /var/www/{{ item.name }}/logs"
-  ignore_errors: True
+  file:
+    path={{ item.dest }}/logs
+    state=directory
   with_items:
     sites
 
 - name: create supervisor logs file
-  command: "touch /var/www/{{ item.name }}/logs/gunicorn_supervisor.log"
-  ignore_errors: True
+  command: "touch {{ item.dest }}/logs/gunicorn_supervisor.log"
+  args:
+    creates: "{{ item.dest }}/logs/gunicorn_supervisor.log"
   with_items:
     sites
+
+- name: supervisor - reread
+  command: supervisorctl reread
+
+- name: supervisor - update
+  command: supervisorctl update
 
 - name: ensure supervisor is working and reading all confs
   supervisorctl:
@@ -100,16 +115,13 @@
 
 - name: setup nginx confs
   template:
-    src=nginx
+    src=nginx_config.conf.j2
     dest=/etc/nginx/sites-available/nginx_config.conf
+  notify: restart nginx
 
 - name: sym-link to sites-enabled
   file:
-    src=/etc/nginx/sites-available/nginx_config
+    src=/etc/nginx/sites-available/nginx_config.conf
     dest=/etc/nginx/sites-enabled/nginx_config.conf
     state=link
-
-- name: ensure nginx is running
-  service:
-    name=nginx
-    state=started
+  notify: restart nginx

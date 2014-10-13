@@ -1,0 +1,6 @@
+---
+
+- name: rest
+  service:
+    name=nginx
+    state=restarted

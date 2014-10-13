@@ -1,5 +1,5 @@
 ---
 
 sites:
-  - { repo: 'git@github.com:carvey/savoysterhouse.git', dest: '/var/www/savoysterhouse', name: 'savoysterhouse', domain: 'savannahsoyosterhouse.com'}
+  - { repo: 'git@github.com:carvey/savoysterhouse.git', dest: '/var/www/savoysterhouse', name: 'savoysterhouse', domain: 'savannahsoysterhouse.con'}
   - { repo: 'git@github.com:carvey/blogger.git', dest: '/var/www/blog', name: 'blog', domain: 'charlesarvey.com'}
