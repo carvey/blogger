@@ -6,80 +6,100 @@
 - name: checkout sites
   git:
     repo="{{ item.repo }}"
-    dest="{{ item.dest }}/{{ item.name }}"
+    dest="{{ root }}/{{ item.name }}/{{ item.name }}"
     accept_hostkey=yes
     update=yes
     key_file="/home/ubuntu/.ssh/id_rsa"
+  when: sites is defined
   with_items:
     sites
 
 - name: remove unused app directories
-  command: "rm -rf {{ root }}/{{ item.name }}"
+  file:
+    path={{ root }}/{{ item.name }}
+    state=absent
+  when: disabled is defined
   with_items:
     disabled
-    root
+
+- name: remove unused supervisor configs
+  file:
+    path=/etc/supervisor/conf.d/{{ item.name }}.conf
+    state=absent
+  when: disabled is defined
+  with_items:
+    disabled
 
 - name: setup virtualenvs with requirements
   pip:
-    virtualenv="{{ item.dest }}"
-    requirements="{{ item.dest }}/{{ item.name }}/requirements/py_requirements.txt"
+    virtualenv="{{ root }}/{{ item.name }}"
+    requirements="{{ root }}/{{ item.name }}/{{ item.name }}/requirements/py_requirements.txt"
+  when: sites is defined
   with_items:
     sites
 
 - name: add a static folder
   file:
-    path={{ item.dest }}/static
+    path={{ root }}/{{ item.name }}/static
     state=directory
+  when: sites is defined
   with_items:
     sites
 
 - name: collect static files
   django_manage:
     command=collectstatic
-    virtualenv={{ item.dest }}
-    app_path={{ item.dest }}/{{ item.name }}
+    virtualenv={{ root }}/{{ item.name }}
+    app_path={{ root }}/{{ item.name }}/{{ item.name }}
+  when: sites is defined
   with_items:
     sites
 
 - name: add a media folder
   file:
-    path={{ item.dest }}/{{ item.name }}/media
+    path={{ root }}/{{ item.name }}/{{ item.name }}/media
     state=directory
+  when: sites is defined
   with_items:
     sites
 
 - name: install gunicorn
   pip:
     name="gunicorn"
-    virtualenv="{{ item.dest }}"
+    virtualenv="{{ root }}/{{ item.name }}"
+  when: sites is defined
   with_items:
     sites
 
 - name: create gunicorn start script
-  template: src=start_gunicorn.j2 dest={{ item.dest }}/bin/start_gunicorn mode=777
+  template: src=start_gunicorn.j2 dest={{ root }}/{{ item.name }}/bin/start_gunicorn mode=777
+  when: sites is defined
   with_items:
     sites
 
 - name: set gunicorn script to executable
   file:
-    path={{ item.dest }}/bin/start_gunicorn
+    path={{ root }}/{{ item.name }}/bin/start_gunicorn
     mode="0700"
+  when: sites is defined
   with_items:
     sites
 
 - name: create the run folder to store the gunicorn communication sock
   file:
-    path={{ item.dest }}/run
+    path={{ root }}/{{ item.name }}/run
     state=directory
+  when: sites is defined
   with_items:
     sites
 
 - name: assign permissions to the project folders
   file:
-    path={{ item.dest }}/../{{ item.name }}
+    path={{ root }}/{{ item.name }}
     state=directory
     mode="777"
     recurse=yes
+  when: sites is defined
   with_items:
     sites
 
@@ -87,20 +107,23 @@
   template:
     src=supervisor.conf.j2
     dest=/etc/supervisor/conf.d/{{ item.name }}.conf
+  when: sites is defined
   with_items:
     sites
 
 - name: create supervisor logs folder
   file:
-    path={{ item.dest }}/logs
+    path={{ root }}/{{ item.name }}/logs
     state=directory
+  when: sites is defined
   with_items:
     sites
 
 - name: create supervisor logs file
-  command: "touch {{ item.dest }}/logs/gunicorn_supervisor.log"
+  command: "touch {{ root }}/{{ item.name }}/logs/gunicorn_supervisor.log"
   args:
-    creates: "{{ item.dest }}/logs/gunicorn_supervisor.log"
+    creates: "{{ root }}/{{ item.name }}/logs/gunicorn_supervisor.log"
+  when: sites is defined
   with_items:
     sites
 
@@ -110,11 +133,12 @@
 - name: supervisor - update
   command: supervisorctl update
 
-- name: ensure supervisor is working and reading all confs
+- name: ensure supervisor is running and reading all confs
   supervisorctl:
     name={{ item.name }}
     state=started
     config=/etc/supervisor/conf.d/{{ item.name }}.conf
+  when: sites is defined
   with_items:
     sites
 
@@ -122,6 +146,7 @@
   template:
     src=nginx_config.conf.j2
     dest=/etc/nginx/sites-available/nginx_config.conf
+  when: sites is defined
   notify: restart nginx
 
 - name: sym-link to sites-enabled
