@@ -13,6 +13,12 @@
   with_items:
     sites
 
+- name: remove unused app directories
+  command: "rm -rf {{ root }}/{{ item.name }}"
+  with_items:
+    disabled
+    root
+
 - name: setup virtualenvs with requirements
   pip:
     virtualenv="{{ item.dest }}"
@@ -76,7 +82,6 @@
     recurse=yes
   with_items:
     sites
-
 
 - name: setup supervisor configs
   template:
