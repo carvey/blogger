@@ -1,4 +1,16 @@
 ---
+#Needs better permissions and dependincies external to pip
+
+- name: nginx installed
+  apt:
+    name=nginx
+    state=present
+    update_cache=yes
+
+- name: supervisor installed
+  pip:
+    name=supervisor
+    state=present
 
 - name: ensure github is a known host
   action: sshknownhosts host=github.com state=present
@@ -22,13 +34,6 @@
   with_items:
     disabled
 
-- name: remove unused supervisor configs
-  file:
-    path=/etc/supervisor/conf.d/{{ item.name }}.conf
-    state=absent
-  when: disabled is defined
-  with_items:
-    disabled
 
 - name: setup virtualenvs with requirements
   pip:
@@ -63,7 +68,7 @@
   with_items:
     sites
 
-- name: install gunicorn
+- name: install gunicorn in virtualenvs
   pip:
     name="gunicorn"
     virtualenv="{{ root }}/{{ item.name }}"
@@ -102,6 +107,14 @@
   when: sites is defined
   with_items:
     sites
+
+- name: remove unused supervisor configs
+  file:
+    path=/etc/supervisor/conf.d/{{ item.name }}.conf
+    state=absent
+  when: disabled is defined
+  with_items:
+    disabled
 
 - name: setup supervisor configs
   template:
@@ -142,11 +155,18 @@
   with_items:
     sites
 
-- name: setup nginx confs
+- name: configure nginx confs
   template:
     src=nginx_config.conf.j2
     dest=/etc/nginx/sites-available/nginx_config.conf
   when: sites is defined
+  notify: restart nginx
+
+- name: remove nginx config if no sites defined
+  file:
+    path=/etc/nginx/sites-available/nginx_config.conf
+    state=absent
+  when: sites is not defined
   notify: restart nginx
 
 - name: sym-link to sites-enabled
@@ -154,4 +174,5 @@
     src=/etc/nginx/sites-available/nginx_config.conf
     dest=/etc/nginx/sites-enabled/nginx_config.conf
     state=link
+  when: sites is defined
   notify: restart nginx
