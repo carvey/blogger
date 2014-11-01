@@ -20,10 +20,13 @@ class Index(View):
 
 
 class CategoryView(View):
-    template = ''
+    template = 'blogger/category.html'
 
-    def get(self, request):
-        context = {}
+    def get(self, request, cat):
+        entries = Entry.objects.filter(categories__slug=cat)
+        category = Category.objects.get(slug=cat)
+        context = {'entries': entries,
+                   'category': category}
         context.update(UNIVERSAL_CONTEXT)
         return render(request, self.template, context)
 

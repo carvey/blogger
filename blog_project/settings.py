@@ -37,6 +37,7 @@ TEMPLATE_LOADERS = (
 
 
 MEDIA_ROOT = os.path.join(PROJECT_PATH, 'media')
+MEDIA_URL = "/media/"
 
 from photologue import PHOTOLOGUE_APP_DIR
 TEMPLATE_DIRS = (

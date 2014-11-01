@@ -3,40 +3,50 @@
 {% load blogger_filters %}
 
 {% block content %}
-    <div class="container">
+    <div class="container" style="text-align: center">
 
         <div class="row">
 
             <!-- Blog Entries Column -->
-            <div class="col-md-8">
+            <div class="col-md-12">
+
 
                 <h1 class="page-header">
-                    Latest Posts
+                    {% block title %}
+                        Latest Posts
+                    {% endblock %}
                 </h1>
-
 
 
                 <!-- Latest Posts -->
                 {% for entry in entries %}
-                <h2>
-                    <a href="{{ entry.categories.all.0.slug }}/{{ entry.slug }}">{{ entry.title }}</a>
-                </h2>
-                <p class="lead">
-                    by <a href="index.php">{{ entry.authors.all.0 }}</a>
-                </p>
+                    {% if entry.status == 2 %}
+                        <h2>
+                            {% if not category %}
+                                <a href="{{ entry.categories.all.0.slug }}/{{ entry.slug }}">{{ entry.title }}</a>
+                            {% else %}
+                                <a href="{{ entry.slug }}">{{ entry.title }}</a>
+                            {% endif %}
+                        </h2>
+        {#                <p class="lead">#}
+        {#                    by <a href="index.php">{{ entry.authors.all.0 }}</a>#}
+        {#                </p>#}
 
-                {% localtime on %}
-                    <p><span class="glyphicon glyphicon-time"></span> Posted on {{ entry.creation_date }}</p>
-                {% endlocaltime %}
-                <hr>
+                        {% localtime on %}
+                            <p><span class="glyphicon glyphicon-time"></span> Posted on {{ entry.creation_date }}</p>
+                        {% endlocaltime %}
+        {#                <hr>#}
+        {##}
+        {#                <img class="img-responsive" src="{{ entry.image.get_thumbnail_url }}" alt="">#}
+        {#                <hr>#}
+                            <div  style="text-align: left">
+                        <p>{{ entry.content|safe|truncatewords:125 }}</p>
+                            </div>
+        {#                <a class="btn btn-primary" href="/{{ entry.categories.all.0 }}/{{ entry.slug }}">Read More#}
+        {#                    <span class="glyphicon glyphicon-chevron-right"></span></a>#}
 
-                <img class="img-responsive" src="{{ entry.image.get_thumbnail_url }}" alt="">
-                <hr>
-                <p>{{ entry.content|safe|truncatewords:25 }}</p>
-                <a class="btn btn-primary" href="/{{ entry.categories.all.0 }}/{{ entry.slug }}">Read More
-                    <span class="glyphicon glyphicon-chevron-right"></span></a>
-
-                <hr>
+                        <hr>
+                    {% endif %}
                 {% endfor %}
 
 
@@ -56,5 +66,5 @@
 
         <!-- /.row -->
 
-        <hr>
+{#        <hr>#}
 {% endblock %}
