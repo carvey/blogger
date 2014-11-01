@@ -3,7 +3,8 @@
 root: '/var/www/'
 
 #Live sites go in the 'sites' dict. Remove this dict if it is not going to be used
-#sites:
+sites:
+ - { repo: 'git@github.com:carvey/EagleTrack.git', name: 'eagletrack', domain: 'charlesarvey.com' }
 
 #sites that need to be removed go in the 'disabled' dict. Remove this dict when it is not being used
 #EX:

@@ -19,7 +19,7 @@
                 <!-- Latest Posts -->
                 {% for entry in entries %}
                 <h2>
-                    <a href="{{ entry.categories.all.0 }}/{{ entry.slug }}">{{ entry.title }}</a>
+                    <a href="{{ entry.categories.all.0.slug }}/{{ entry.slug }}">{{ entry.title }}</a>
                 </h2>
                 <p class="lead">
                     by <a href="index.php">{{ entry.authors.all.0 }}</a>

@@ -1,6 +1,12 @@
 ---
 #Needs better permissions and dependincies external to pip
 
+- name: pip installed
+  apt:
+    name=python-pip
+    state=present
+    update_cache=yes
+
 - name: nginx installed
   apt:
     name=nginx
@@ -8,12 +14,34 @@
     update_cache=yes
 
 - name: supervisor installed
-  pip:
+  apt:
     name=supervisor
     state=present
 
-- name: ensure github is a known host
-  action: sshknownhosts host=github.com state=present
+- name: group set up
+  group:
+    name=webapps
+    state=present
+
+- name: user set up
+  user:
+    name=webadmin
+    state=present
+    group=webapps
+#
+#- name: ensure github is a known host
+#  action: sshknownhosts host=github.com state=present
+
+- name: add id_rsa file to ssh dir
+  copy:
+    src=id_rsa
+    dest="~/.ssh/"
+
+- name: git is installed
+  apt:
+    name=git
+    state=present
+    update_cache=yes
 
 - name: checkout sites
   git:
@@ -34,6 +62,20 @@
   with_items:
     disabled
 
+- name: virtualenv installed
+  pip:
+    name=virtualenv
+    state=present
+
+- name: libmysqlclient-dev installed
+  apt:
+    name=libmysqlclient-dev
+    state=present
+
+- name: python-dev installed
+  apt:
+    name=python-dev
+    state=present
 
 - name: setup virtualenvs with requirements
   pip:
@@ -169,6 +211,12 @@
   when: sites is not defined
   notify: restart nginx
 
+- name: remove default nginx config
+  file:
+    path=/etc/nginx/sites-available/default
+    state=absent
+  notify: restart nginx
+
 - name: sym-link to sites-enabled
   file:
     src=/etc/nginx/sites-available/nginx_config.conf
@@ -176,3 +224,8 @@
     state=link
   when: sites is defined
   notify: restart nginx
+
+- name: nginx started
+  service:
+    name=nginx
+    state=started

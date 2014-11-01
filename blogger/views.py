@@ -32,7 +32,7 @@ class PostView(View):
     template = 'blogger/post.html'
 
     def get(self, request, requested_category, slug):
-        category = Category.objects.get(title=requested_category)
+        category = Category.objects.get(slug=requested_category)
         entry = Entry.objects.get(slug=slug)
 
         context = {'category': category,

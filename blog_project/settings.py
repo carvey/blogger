@@ -63,12 +63,12 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
-    #'django.contrib.comments',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    'django_comments',
     #'photologue',
     'tagging',
     'mptt',
@@ -76,6 +76,7 @@ INSTALLED_APPS = (
     'south',
     'sortedm2m',
     'blogger',
+    'tinymce',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -95,13 +96,24 @@ WSGI_APPLICATION = 'blog_project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'blogger',
+#         'USER': 'charles',
+#         'PASSWORD': 'shorefish',
+#         'HOST': 'savoysterhouse.cnkdqqk3dlt2.us-west-2.rds.amazonaws.com',
+#         'PORT': '3306',
+#     }
+# }
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'blogger',
-        'USER': 'charles',
-        'PASSWORD': 'shorefish',
-        'HOST': 'savoysterhouse.cnkdqqk3dlt2.us-west-2.rds.amazonaws.com',
+        'USER': 'root',
+        'PASSWORD': '',
+        'HOST': 'localhost',
         'PORT': '3306',
     }
 }
@@ -128,3 +140,8 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
                STATIC_PATH,
                )
+
+TINYMCE_DEFAULT_CONFIG = {
+    'plugins': "table,paste,searchreplace",
+    'theme': "advanced",
+}
