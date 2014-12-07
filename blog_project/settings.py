@@ -145,4 +145,7 @@ STATICFILES_DIRS = (
 TINYMCE_DEFAULT_CONFIG = {
     'plugins': "table,paste,searchreplace",
     'theme': "advanced",
+    'height': 500,
+    'width': 700,
+    'theme_advanced_resizing': True
 }
