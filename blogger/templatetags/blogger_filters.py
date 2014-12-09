@@ -17,3 +17,10 @@ def adjust_time(time):
 @register.simple_tag
 def settings_value(name):
     return getattr(settings, name, "")
+
+@register.filter(name='exclude_cats')
+def exclude_cats(cat):
+    if cat.title == "About" or cat.title == "Links":
+        return False
+    else:
+        return True

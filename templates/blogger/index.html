@@ -3,13 +3,6 @@
 {% load blogger_filters %}
 
 {% block content %}
-    <div class="container" style="text-align: center">
-
-        <div class="row">
-
-            <!-- Blog Entries Column -->
-            <div class="col-md-12">
-
 
                 <h1 class="page-header">
                     {% block title %}
@@ -40,7 +33,7 @@
         {#                <img class="img-responsive" src="{{ entry.image.get_thumbnail_url }}" alt="">#}
         {#                <hr>#}
                             <div  style="text-align: left">
-                        <p>{{ entry.content|safe|truncatewords:125 }}</p>
+                        <p>{{ entry.content|safe|truncatewords:75 }}</p>
                             </div>
         {#                <a class="btn btn-primary" href="/{{ entry.categories.all.0 }}/{{ entry.slug }}">Read More#}
         {#                    <span class="glyphicon glyphicon-chevron-right"></span></a>#}
@@ -48,9 +41,6 @@
                         <hr>
                     {% endif %}
                 {% endfor %}
-
-
-
                 <!-- Pager -->
                 <ul class="pager">
                     <li class="previous">
@@ -60,10 +50,6 @@
                         <a href="#">Newer &rarr;</a>
                     </li>
                 </ul>
-
-            </div>
-
-
         <!-- /.row -->
 
 {#        <hr>#}

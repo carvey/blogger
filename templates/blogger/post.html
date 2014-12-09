@@ -3,13 +3,6 @@
 {% load tz %}
 
 {% block content %}
-    <!-- Page Content -->
-    <div class="container" style="text-align: center">
-
-        <div class="row">
-
-            <!-- Blog Post Content Column -->
-            <div class="col-lg-12">
 
                 <!-- Blog Post -->
 
@@ -22,21 +15,17 @@
                 </p>
 
                 <hr>
-
                 <!-- Date/Time -->
                 {% localtime on %}
                     <p><span class="glyphicon glyphicon-time"></span> {{ entry.creation_date }}</p>
                 {% endlocaltime %}
                 <hr>
-
-                <div align="center">
-                    {% if entry.image %}
+                {% if entry.image %}
+                    <div align="center">
                         <img src="{{ entry.image.url }}">
-                    {% endif %}
-                </div>
-
+                    </div>
                 <hr>
-
+                {% endif %}
                 <div style="text-align: left">
                     <!-- Post Content -->
                     {{ entry.content|safe }}
@@ -45,6 +34,4 @@
 
 
                 <hr>
-
-            </div>
 {% endblock %}
