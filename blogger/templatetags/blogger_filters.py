@@ -20,7 +20,7 @@ def settings_value(name):
 
 @register.filter(name='exclude_cats')
 def exclude_cats(cat):
-    if cat.title == "About" or cat.title == "Links":
+    if cat.title == "About" or cat.title == "Links" or cat.title == "Contact":
         return False
     else:
         return True
