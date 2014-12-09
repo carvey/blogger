@@ -3,7 +3,18 @@
 {% load blogger_filters %}
 
 {% block content %}
-
+                {% block intro %}
+                <hi class="page-header" style="font-weight: bolder; font-size: 30px" align="center">
+                    The WebDev Blog
+                </hi>
+                <div style="padding: 10px; font-size: 17px;">
+                    The web is a pretty cool place, and it has changed the way that society functions. Information is available
+                    at a whims notice, we can communicate and interact with thousands or millions of people across the world
+                    in an instant, and we can manage data in ways more efficient than our great grandparents would have ever thought
+                    possible. So the question is, how can individuals who are still learning about this amazing process break into
+                    the industry of reading and writing to the web?
+                </div>
+                {% endblock %}
                 <h1 class="page-header">
                     {% block title %}
                         Latest Posts
